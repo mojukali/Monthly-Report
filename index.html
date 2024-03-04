@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+
+
+<body>
+<!-- Link SpreadSheet -->
+   
+
+    <section class="contact section" id="contact">
+        <div class="contact__container grid">
+           <div class="contact__data">
+              <h2 class="section__title-2">
+                 <span>Monthly Report</span>
+              </h2>
+
+              
+              <p class="contact__description-1">
+                 Laporkan kegiatan yang terjadi di sekolah <b>Belajar Mengajar</b> atau 
+                 <b>Tidak</b>  disini.
+               </p>
+               
+               <p class="contact__description-2">
+                  Laporan ini akan masuk ke SpreedSheet Monthly Report tentang kegiatan yang terjadi.
+               </p>
+               
+               <div class="geometric-box"></div>
+            </div>
+            
+            <div class="contact__mail">
+               <h2 class="contact__title">
+                  Lapor <span style="color: crimson;">!</span>
+               </h2>
+               
+            <form action="https://script.google.com/macros/s/AKfycbzoBnd7R1PdZBRjfJZXMT--Hfqm5yxGrsMjTmue9NzOzvi5lPBMYr6AcPaLlk0iUcwVjw/exec" class="contact__form" id="gajiForm" method="post" enctype="multipart/form-data">
+                  <div class="contact__box">
+                     <input type="number" name="no" class="contact__input" id="no" required placeholder="Nomor">
+                     <label for="no" class="contact__label">Nomor</label>
+                  </div>
+
+                  <div class="contact__box">
+                     <input type="text" name="nama" class="contact__input" id="nama" required placeholder="Nama Kegiatan">
+                     <label for="nama" class="contact__label">Nama Kegiatan</label>
+                  </div>
+                  
+                  <label for="jenis">Jenis Kegiatan: </label>
+                     <div class="contact__box">
+                        <select class="contact__input" id="jenis" name="jenis" required placeholder="Pilih Jenis Kegiatan">
+                            <option value="kbm">KBM</option>
+                            <option value="nonkbm">Non KBM</option>
+                        </select>
+                     </div>
+                     
+                  <label for="tgl_kgt">Tanggal kegiatan:</label>
+                 <div class="contact__box">
+                  <input type="date" id="tgl_kgt" name="tgl_kgt" class="contact__input"  required>
+                 </div>
+                  
+
+                 <div class="contact__box contact__area">
+                  <textarea name="uraian" id="uraian" class="contact__input" required placeholder="Uraian Kegiatan"></textarea>
+                  <label for="uraian" class="contact__label">Uraian Kegiatan</label>
+               </div>
+
+               <div class="contact__box contact__area">
+                  <textarea name="target" id="target" class="contact__input" required placeholder="Target Capaian"></textarea>
+                  <label for="target" class="contact__label">Target Capaian</label>
+               </div>
+
+                 <p class="contact__message" id="contact-message"></p>
+
+                 
+                 <label for="buktis">Bukti Kegiatan:</label>
+                 <div class="contact__box">
+                        <input type="file" class="contact__input"  name="buktis" id="buktis" accept="image/*">
+                        <canvas id="canvas" style="display: none;"></canvas>
+                        <input type="hidden" id="buktisEnc" name="buktisEnc">
+                     </div> 
+                 
+                     <div class="contact__box">
+                        <button class="contact__input" onclick="captureImage()">Mulai Webcam</button>
+                        <input type="file" id="buktis" style="display: none;" accept="image/*">
+                        <video autoplay="true" id="video-webcam" style="display: none;"></video>
+                        <canvas id="canvas" style="display: none;"></canvas>
+                        <img id="capturedImage" style="display: none;">
+                    </div>
+                    <div class="contact__group">
+                        <div class="contact__box">
+                            <button class="contact__input" onclick="takeSnapshot()">Take Foto</button>
+                        </div>
+                        <div class="contact__box">
+                            <button type="submit" value="Simpan Data" class="contact__input">
+                             <i class="ri-send-plane-line"></i> Simpan Data
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <script>
+                        var video = document.querySelector("#video-webcam");
+                        var canvas = document.getElementById('canvas');
+                        var context = canvas.getContext('2d');
+                        var isWebcamActive = false;
+                    
+                        async function captureImage() {
+                            try {
+                                // Hide file input
+                                document.getElementById('buktis').style.display = 'none';
+                    
+                                // Show video and canvas
+                                video.style.display = 'block';
+                                canvas.style.display = 'block';
+                    
+                                // Check if webcam is already active
+                                if (!isWebcamActive) {
+                                    // Start webcam
+                                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                                    video.srcObject = stream;
+                                    // Save the stream reference to be used later
+                                    window.stream = stream;
+                                    isWebcamActive = true;
+                                }
+                            } catch (e) {
+                                // Handle error
+                                console.error("Error accessing webcam:", e);
+                                alert("Error accessing webcam. Make sure your browser supports getUserMedia and you are using a secure connection (HTTPS).");
+                            }
+                        }
+                    
+                        document.getElementById('buktis').addEventListener('change', function (event) {
+                            var file = event.target.files[0];
+                            var reader = new FileReader();
+                            reader.onloadend = function () {
+                                document.getElementById('buktisEnc').value = reader.result.split(',')[1];
+                                stopWebcam();
+                            }
+                            reader.readAsDataURL(file);
+                    
+                            // Hide video and canvas
+                            video.style.display = 'none';
+                            canvas.style.display = 'none';
+                        });
+                    
+                        function takeSnapshot() {
+                            if (isWebcamActive) {
+                                var width = video.offsetWidth,
+                                    height = video.offsetHeight;
+                    
+                                canvas.width = width;
+                                canvas.height = height;
+                                context.drawImage(video, 0, 0, width, height);
+                    
+                                // Display the captured image
+                                var img = document.getElementById('capturedImage');
+                                img.src = canvas.toDataURL('image/png');
+                                img.style.display = 'block';
+                    
+                                // Stop the webcam stream after taking the snapshot
+                                stopWebcam();
+                            } else {
+                                alert("Please start the webcam before taking a snapshot.");
+                            }
+                        }
+                    
+                        function stopImageCapture() {
+                            stopWebcam();
+                            document.getElementById('buktis').style.display = 'none';
+                            document.getElementById('capturedImage').style.display = 'none';
+                        }
+                    
+                        function stopWebcam() {
+                            // Check if stream is available
+                            if (window.stream) {
+                                // Get all tracks and stop each one
+                                window.stream.getTracks().forEach(track => track.stop());
+                                isWebcamActive = false;
+                            }
+                        }
+                    </script>
+                    
+
+              </form>
+           </div>
+        </div>
+     </section>
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>
